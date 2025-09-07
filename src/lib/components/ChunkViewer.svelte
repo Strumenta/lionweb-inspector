@@ -12,6 +12,7 @@
 	} = $props();
 
 	let selectedChunk: { name: string; content: any; type: 'json' | 'pb'; size: number; pbType?: string } | null = $state(null);
+	let protobufferView: 'raw' | 'chunk' | 'loaded' = $state('raw');
 
 	// Combine all chunks into a single list
 	function getAllChunks() {
@@ -41,6 +42,8 @@
 
 	function selectChunk(chunk: ReturnType<typeof getAllChunks>[0]) {
 		selectedChunk = chunk;
+		// Reset protobuffer view to raw when selecting a new chunk
+		protobufferView = 'raw';
 	}
 
 	function formatFileSize(bytes: number): string {
@@ -133,13 +136,57 @@
 							</div>
 
 							<!-- Content Preview -->
-							<div class="space-y-2">
-								<h3 class="text-lg font-medium">Content Preview</h3>
+							<div class="space-y-4">
+								<div class="flex items-center justify-between">
+									<h3 class="text-lg font-medium">Content Preview</h3>
+									{#if selectedChunk.type === 'pb'}
+										<div class="flex gap-2">
+											<Button 
+												variant={protobufferView === 'raw' ? 'default' : 'outline'}
+												size="sm"
+												onclick={() => protobufferView = 'raw'}
+											>
+												Raw
+											</Button>
+											<Button 
+												variant={protobufferView === 'chunk' ? 'default' : 'outline'}
+												size="sm"
+												onclick={() => protobufferView = 'chunk'}
+											>
+												Chunk
+											</Button>
+											<Button 
+												variant={protobufferView === 'loaded' ? 'default' : 'outline'}
+												size="sm"
+												onclick={() => protobufferView = 'loaded'}
+											>
+												Loaded
+											</Button>
+										</div>
+									{/if}
+								</div>
+								
 								<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 max-h-96 overflow-auto">
 									{#if selectedChunk.type === 'json'}
 										<pre class="text-sm whitespace-pre-wrap break-words">{JSON.stringify(selectedChunk.content, null, 2)}</pre>
-									{:else}
-										<pre class="text-sm whitespace-pre-wrap break-words">{JSON.stringify(selectedChunk.content, null, 2)}</pre>
+									{:else if selectedChunk.type === 'pb'}
+										{#if protobufferView === 'raw'}
+											<pre class="text-sm whitespace-pre-wrap break-words">{JSON.stringify(selectedChunk.content, null, 2)}</pre>
+										{:else if protobufferView === 'chunk'}
+											<div class="text-center py-8">
+												<div class="text-gray-500 dark:text-gray-400">
+													<h4 class="text-lg font-medium mb-2">Chunk View</h4>
+													<p>To be implemented</p>
+												</div>
+											</div>
+										{:else if protobufferView === 'loaded'}
+											<div class="text-center py-8">
+												<div class="text-gray-500 dark:text-gray-400">
+													<h4 class="text-lg font-medium mb-2">Loaded View</h4>
+													<p>To be implemented</p>
+												</div>
+											</div>
+										{/if}
 									{/if}
 								</div>
 							</div>

@@ -2,6 +2,8 @@
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import { FileJson, Database, File as FileIcon, Archive } from '@lucide/svelte';
+	import { ProperChunkViewer } from '$lib/components';
+    import { PBChunk } from '$lib/proto';
 
 	let { 
 		jsonFiles = [],
@@ -174,10 +176,12 @@
 											<pre class="text-sm whitespace-pre-wrap break-words">{JSON.stringify(selectedChunk.content, null, 2)}</pre>
 										{:else if protobufferView === 'chunk'}
 											<div class="text-center py-8">
-												<div class="text-gray-500 dark:text-gray-400">
-													<h4 class="text-lg font-medium mb-2">Chunk View</h4>
-													<p>To be implemented</p>
-												</div>
+												
+												 NODES: {JSON.stringify((selectedChunk.content as PBChunk).nodes.length)}
+												 LANGUAGES: {JSON.stringify((selectedChunk.content as PBChunk).internedLanguages.length)}
+												 METAPOINTERS: {JSON.stringify((selectedChunk.content as PBChunk).internedMetaPointers.length)}
+												 STRINGS: {JSON.stringify((selectedChunk.content as PBChunk).internedStrings.length)}
+												 <ProperChunkViewer pbChunk={selectedChunk.content as PBChunk} />
 											</div>
 										{:else if protobufferView === 'loaded'}
 											<div class="text-center py-8">

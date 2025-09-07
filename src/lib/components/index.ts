@@ -3,3 +3,4 @@ export { default as FileInspector } from './FileInspector.svelte';
 export { default as ImportingProcess } from './ImportingProcess.svelte';
 export { default as ChunkViewer } from './ChunkViewer.svelte';
 export { default as FileInspectorModal } from './FileInspectorModal.svelte';
+export { default as ProperChunkViewer } from './ProperChunkViewer.svelte';

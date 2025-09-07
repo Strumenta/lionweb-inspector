@@ -137,7 +137,7 @@
             </div>
 
             {#if selectedTree !== null}
-                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900 overflow-x-auto">
                     {@render TreeNode(renderTreeNode(roots[selectedTree]))}
                 </div>
             {/if}
@@ -149,10 +149,10 @@
 {#snippet TreeNode(data)}
     <div class="select-none">
         <!-- Node Container with Properties and References -->
-        <div class="border border-gray-200 dark:border-gray-700 rounded-lg mb-2 bg-white dark:bg-gray-800">
+        <div class="border border-black dark:border-white rounded-lg mb-2 bg-white dark:bg-gray-800" style="background-color: ivory;">
             <div 
                 class="flex items-center gap-2 py-2 px-3 rounded-t-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
-                style="padding-left: {data.depth * 20 + 12}px"
+                style="padding-left: {data.depth * 12 + 12}px"
                 role="button"
                 tabindex="0"
                 onclick={() => data.hasChildren && toggleNode(data.node.id)}
@@ -189,7 +189,7 @@
             </div>
 
             {#if data.node.properties.length > 0}
-                <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-b-lg p-3">
+                <div class="border-t border-gray-200 dark:border-gray-700 rounded-b-lg p-3">
                     <div class="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">Properties:</div>
                     <div class="space-y-3">
                          {#each data.node.properties as property}
@@ -218,7 +218,7 @@
             {/if}
         
             {#if data.node.references.length > 0}
-                <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-b-lg p-3">
+                <div class="border-t border-gray-200 dark:border-gray-700 rounded-b-lg p-3">
                     <div class="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">References:</div>
                     <div class="space-y-3">
                         {#each data.node.references as reference}
@@ -273,8 +273,8 @@
         
         <!-- Annotations Container (Outside the bordered container, only when expanded) -->
         {#if data.isExpanded && data.node.annotations.length > 0}
-            <div class="relative" style="margin-left: {data.depth * 20 + 20}px;">
-                <div class="mb-2">
+            <div class="relative" style="margin-left: {data.depth * 12 + 16}px;">
+                <div class="mb-4">
                     <div class="text-xs text-gray-600 dark:text-gray-400 mb-1 font-medium">Annotations:</div>
                     <div class="space-y-1">
                         {#each data.node.annotations as annotationId}
@@ -291,17 +291,17 @@
 
         <!-- Children Container (Outside the bordered container) -->
         {#if data.isExpanded && data.hasChildren}
-            <div class="relative" style="margin-left: {data.depth * 20 + 20}px;">
+            <div class="relative" style="margin-left: {data.depth * 12 + 16}px;">
                 <!-- Connecting Line -->
                 <div class="absolute left-0 top-0 w-px h-full bg-gray-300 dark:bg-gray-600"></div>
                 
                 {#each getChildrenWithContainment(data.node) as childWithContainment}
-                    <div class="relative">
+                    <div class="relative mb-4">
                         <!-- Horizontal connecting line -->
                         <div class="absolute left-0 top-6 w-4 h-px bg-gray-300 dark:bg-gray-600"></div>
                         
                         <!-- Containment metapointer display -->
-                        <div class="text-xs text-gray-500 dark:text-gray-400 mb-1 ml-6">
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mb-2 ml-6">
                             <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                                 {childWithContainment.containment.containment.key}
                             </span>

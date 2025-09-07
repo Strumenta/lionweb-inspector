@@ -158,7 +158,36 @@
                 ({data.node.classifier.key})
             </span>
         </div>
-        
+
+        {#if data.node.properties.length > 0}
+            <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-b-lg p-3">
+                <div class="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">Properties:</div>
+                <div class="space-y-3">
+                     {#each data.node.properties as property}
+                         <div class="flex gap-3">
+                             <!-- Property Key Column (Tag-like) -->
+                             <div class="flex-shrink-0">
+                                 <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                     {property.property.key}
+                                 </span>
+                             </div>
+                             
+                             <!-- Property Value Column -->
+                             <div class="flex-1 min-w-0">
+                                 {#if property.value}
+                                     <div class="text-gray-700 dark:text-gray-300 font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded whitespace-pre-wrap break-words">
+                                         {property.value}
+                                     </div>
+                                 {:else}
+                                     <span class="text-gray-400 italic">No value</span>
+                                 {/if}
+                             </div>
+                         </div>
+                     {/each}
+                </div>
+            </div>
+        {/if}
+    
         {#if data.node.references.length > 0}
             <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-b-lg p-3">
                 <div class="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">References:</div>

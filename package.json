@@ -26,5 +26,10 @@
 		"tw-animate-css": "^1.3.8",
 		"typescript": "^5.0.0",
 		"vite": "^7.0.4"
+	},
+	"dependencies": {
+		"@lionweb/json": "^0.6.13-beta.5",
+		"@types/jszip": "^3.4.0",
+		"jszip": "^3.10.1"
 	}
 }

@@ -1,13 +1,170 @@
 <script lang="ts">
-    import type { LionWebJsonChunk } from "@lionweb/json";
+    import type { LionWebJsonChunk, LionWebJsonNode } from "@lionweb/json";
     import { convertPBChunkToJsonChunk } from "$lib/proto/importlogic";
+    import type { PBChunk } from "$lib/proto";
+    import { Button } from '$lib/components/ui/button';
+    import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
+    import { ChevronRight, ChevronDown, TreePine, FileText } from '@lucide/svelte';
 
     let { pbChunk }: { pbChunk: PBChunk } = $props();
 
     const jsonChunk: LionWebJsonChunk = convertPBChunkToJsonChunk(pbChunk);
+    const nodesByID = new Map<string, LionWebJsonNode>();
+    jsonChunk.nodes.forEach(node => {
+        nodesByID.set(node.id, node);
+    });
+    const roots = jsonChunk.nodes.filter(node => node.parent === undefined);
+    
+    let expandedNodes = $state(new Set<string>());
+    let selectedTree = $state<number | null>(null);
+
+    function toggleNode(nodeId: string) {
+        if (expandedNodes.has(nodeId)) {
+            expandedNodes.delete(nodeId);
+        } else {
+            expandedNodes.add(nodeId);
+        }
+        expandedNodes = new Set(expandedNodes); // Trigger reactivity
+    }
+
+    function getChildren(node: LionWebJsonNode): LionWebJsonNode[] {
+        const children: LionWebJsonNode[] = [];
+        node.containments.forEach(containment => {
+            containment.children.forEach(childId => {
+                const child = nodesByID.get(childId);
+                if (child) {
+                    children.push(child);
+                }
+            });
+        });
+        return children;
+    }
+
+    function getNodeDisplayName(node: LionWebJsonNode): string {
+        // Try to find a name property
+        const nameProperty = node.properties.find(prop => 
+            prop.property.key === 'name' || 
+            prop.property.key === 'Name' ||
+            prop.property.key === 'id'
+        );
+        return nameProperty?.value || node.id || 'Unnamed Node';
+    }
+
+    function renderTreeNode(node: LionWebJsonNode, depth: number = 0) {
+        const children = getChildren(node);
+        const isExpanded = expandedNodes.has(node.id);
+        const hasChildren = children.length > 0;
+        const displayName = getNodeDisplayName(node);
+        
+        return {
+            node,
+            children,
+            isExpanded,
+            hasChildren,
+            displayName,
+            depth
+        };
+    }
 </script>
 
-<div class="text-gray-500 dark:text-gray-400">
-    <h4 class="text-lg font-medium mb-2">Chunk View</h4>
-    <p>To be implemented ABC</p>
+<div class="space-y-4">
+    <div class="flex items-center justify-between">
+        <h4 class="text-lg font-medium">Chunk View</h4>
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+            {roots.length} root{roots.length !== 1 ? 's' : ''} found
+        </div>
+    </div>
+
+    {#if roots.length === 0}
+        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+            <TreePine class="h-12 w-12 mx-auto mb-4" />
+            <p>No root nodes found in this chunk</p>
+        </div>
+    {:else if roots.length === 1}
+        <!-- Single tree - show directly -->
+        <div class="space-y-2">
+            <h5 class="font-medium text-sm text-gray-700 dark:text-gray-300">Tree Structure</h5>
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
+                {@render TreeNode(renderTreeNode(roots[0]))}
+            </div>
+        </div>
+    {:else}
+        <!-- Multiple trees - show selector -->
+        <div class="space-y-4">
+            <h5 class="font-medium text-sm text-gray-700 dark:text-gray-300">Select a tree to view:</h5>
+            <div class="grid gap-2">
+                {#each roots as root, index}
+                    <Button 
+                        variant={selectedTree === index ? "default" : "outline"}
+                        class="justify-start h-auto p-3"
+                        onclick={() => selectedTree = selectedTree === index ? null : index}
+                    >
+                        <div class="flex items-center gap-3 w-full">
+                            <TreePine class="h-4 w-4 flex-shrink-0" />
+                            <div class="flex-1 min-w-0 text-left">
+                                <div class="font-medium text-sm truncate">{getNodeDisplayName(root)}</div>
+                                <div class="text-xs text-gray-500">
+                                    {getChildren(root).length} direct children
+                                </div>
+                            </div>
+                        </div>
+                    </Button>
+                {/each}
+            </div>
+
+            {#if selectedTree !== null}
+                <div class="space-y-2">
+                    <h5 class="font-medium text-sm text-gray-700 dark:text-gray-300">
+                        Tree: {getNodeDisplayName(roots[selectedTree])}
+                    </h5>
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
+                        {@render TreeNode(renderTreeNode(roots[selectedTree]))}
+                    </div>
+                </div>
+            {/if}
+        </div>
+    {/if}
 </div>
+
+<!-- TreeNode Component -->
+{#snippet TreeNode(data)}
+    <div class="select-none">
+        <div 
+            class="flex items-center gap-2 py-1 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+            style="padding-left: {data.depth * 20 + 8}px"
+            role="button"
+            tabindex="0"
+            onclick={() => data.hasChildren && toggleNode(data.node.id)}
+            onkeydown={(e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && data.hasChildren) {
+                    e.preventDefault();
+                    toggleNode(data.node.id);
+                }
+            }}
+        >
+            {#if data.hasChildren}
+                {#if data.isExpanded}
+                    <ChevronDown class="h-4 w-4 text-gray-500" />
+                {:else}
+                    <ChevronRight class="h-4 w-4 text-gray-500" />
+                {/if}
+            {:else}
+                <div class="w-4 h-4"></div>
+            {/if}
+            
+            <FileText class="h-4 w-4 text-gray-400" />
+            <span class="text-sm font-medium">{data.displayName}</span>
+            <span class="text-xs text-gray-500 ml-auto">
+                {data.node.classifier.key}
+            </span>
+        </div>
+        
+        {#if data.isExpanded && data.hasChildren}
+            <div>
+                {#each data.children as child}
+                    {@render TreeNode(renderTreeNode(child, data.depth + 1))}
+                {/each}
+            </div>
+        {/if}
+    </div>
+{/snippet}

@@ -128,10 +128,10 @@
 
 <!-- TreeNode Component -->
 {#snippet TreeNode(data)}
-    <div class="select-none">
+    <div class="select-none border border-gray-200 dark:border-gray-700 rounded-lg mb-2 bg-white dark:bg-gray-800">
         <div 
-            class="flex items-center gap-2 py-1 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-            style="padding-left: {data.depth * 20 + 8}px"
+            class="flex items-center gap-2 py-2 px-3 rounded-t-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+            style="padding-left: {data.depth * 20 + 12}px"
             role="button"
             tabindex="0"
             onclick={() => data.hasChildren && toggleNode(data.node.id)}
@@ -154,15 +154,15 @@
             
             <FileText class="h-4 w-4 text-gray-400" />
             <span class="text-sm font-medium">{data.displayName}</span>
-            <span class="text-xs text-gray-500 ml-auto">
-                {data.node.classifier.key}
+            <span class="text-xs text-gray-500">
+                ({data.node.classifier.key})
             </span>
         </div>
         
         {#if data.node.references.length > 0}
-            <div class="text-left" style="padding-left: {data.depth * 20 + 24}px">
-                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">References:</div>
-                <div class="space-y-2">
+            <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-b-lg p-3">
+                <div class="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">References:</div>
+                <div class="space-y-3">
                     {#each data.node.references as reference}
                         <div class="flex gap-3">
                             <!-- Reference Key Column (Tag-like) -->

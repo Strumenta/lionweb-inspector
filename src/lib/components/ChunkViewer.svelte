@@ -107,9 +107,19 @@
 					<CardHeader>
 						{#if selectedChunk}
 							{@const IconComponent = getChunkIcon(selectedChunk)}
-							<CardTitle class="flex items-center gap-2">
-								<IconComponent class="h-5 w-5" />
-								{selectedChunk.name}
+							<CardTitle class="flex items-center justify-between">
+								<div class="flex items-center gap-2">
+									<IconComponent class="h-5 w-5" />
+									{selectedChunk.name}
+								</div>
+								<div class="flex items-center gap-3">
+									<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+										{selectedChunk.type === 'json' ? 'JSON' : 'Protobuffer'}
+									</span>
+									<span class="text-xs text-gray-500 dark:text-gray-400">
+										{formatFileSize(selectedChunk.size)}
+									</span>
+								</div>
 							</CardTitle>
 							<CardDescription>
 								{selectedChunk.type === 'json' ? 'JSON Chunk' : 'Protobuffer Chunk'} • {formatFileSize(selectedChunk.size)}
@@ -121,22 +131,6 @@
 					</CardHeader>
 					<CardContent>
 						<div class="space-y-4">
-							<!-- Chunk Information -->
-							<div class="grid grid-cols-2 gap-4">
-								<div class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-									<div class="text-sm font-medium text-blue-800 dark:text-blue-200">Type</div>
-									<div class="text-lg font-bold text-blue-900 dark:text-blue-100">
-										{selectedChunk.type === 'json' ? 'JSON' : 'Protobuffer'}
-									</div>
-								</div>
-								<div class="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-									<div class="text-sm font-medium text-green-800 dark:text-green-200">Size</div>
-									<div class="text-lg font-bold text-green-900 dark:text-green-100">
-										{formatFileSize(selectedChunk.size)}
-									</div>
-								</div>
-							</div>
-
 							<!-- Content Preview -->
 							<div class="space-y-4">
 								<div class="flex items-center justify-between">

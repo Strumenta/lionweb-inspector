@@ -4,7 +4,7 @@
     import type { PBChunk } from "$lib/proto";
     import { Button } from '$lib/components/ui/button';
     import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-    import { ChevronRight, ChevronDown, TreePine, FileText } from '@lucide/svelte';
+    import { ChevronRight, ChevronDown, TreePine, FileText, Target } from '@lucide/svelte';
 
     let { pbChunk }: { pbChunk: PBChunk } = $props();
 
@@ -158,6 +158,59 @@
                 {data.node.classifier.key}
             </span>
         </div>
+        
+        {#if data.node.references.length > 0}
+            <div class="text-left" style="padding-left: {data.depth * 20 + 24}px">
+                <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">References:</div>
+                <div class="space-y-2">
+                    {#each data.node.references as reference}
+                        <div class="flex gap-3">
+                            <!-- Reference Key Column (Tag-like) -->
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                    {reference.reference.key}
+                                </span>
+                            </div>
+                            
+                            <!-- Targets Column -->
+                            <div class="flex-1 min-w-0">
+                                {#if reference.targets.length > 0}
+                                    <div class="space-y-1">
+                                        {#each reference.targets as target}
+                                            <div class="flex items-center gap-2 text-xs">
+                                                {#if target.resolveInfo}
+                                                    <span class="text-gray-700 dark:text-gray-300 font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                                                        {target.resolveInfo}
+                                                    </span>
+                                                    {#if target.referred}
+                                                        <span class="text-gray-400">→</span>
+                                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                            <Target class="h-3 w-3" />
+                                                            {target.referred}
+                                                        </span>
+                                                    {:else}
+                                                        <span class="text-gray-400 italic">Not resolved</span>
+                                                    {/if}
+                                                {:else if target.referred}
+                                                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                                        <Target class="h-3 w-3" />
+                                                        {target.referred}
+                                                    </span>
+                                                {:else}
+                                                    <span class="text-gray-400 italic">No target info</span>
+                                                {/if}
+                                            </div>
+                                        {/each}
+                                    </div>
+                                {:else}
+                                    <div class="text-xs text-gray-400 italic">No targets</div>
+                                {/if}
+                            </div>
+                        </div>
+                    {/each}
+                </div>
+            </div>
+        {/if}
         
         {#if data.isExpanded && data.hasChildren}
             <div>

@@ -1,4 +1,4 @@
-import type { LionWebJsonChunk } from "@lionweb/json";
+import type { LionWebJsonChunk, LionWebJsonReference, LionWebJsonReferenceTarget } from "@lionweb/json";
 import type { PBBulkImport } from "./BulkImport";
 import type { PBChunk } from "./Chunk";
 
@@ -74,12 +74,12 @@ export function convertPBChunkToJsonChunk(pbChunk: PBChunk) : LionWebJsonChunk {
         // Convert references
         for (let j = 0; j < references.length; j++) {
             const r = references[j]
-            const convertedTargets = new Array(r.values.length)
+            const convertedTargets : LionWebJsonReferenceTarget[] = new Array(r.values.length)
             for (let k = 0; k < r.values.length; k++) {
                 const rv = r.values[k]
                 convertedTargets[k] = {
-                    reference: rv.referred == undefined ? undefined : internedStrings[rv.referred],
-                    resolveInfo: rv.resolveInfo == undefined ? undefined : internedStrings[rv.resolveInfo]
+                    referred: rv.referred == undefined || rv.referred == null ? null : internedStrings[rv.referred],
+                    resolveInfo: rv.resolveInfo == undefined || rv.resolveInfo == null ? null : internedStrings[rv.resolveInfo]
                 }
             }
             convertedReferences[j] = {

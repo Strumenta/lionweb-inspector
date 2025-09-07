@@ -1,4 +1,5 @@
-import type { LionWebJsonChunk, LionWebJsonReference, LionWebJsonReferenceTarget } from "@lionweb/json";
+import type { LionWebJsonChunk, LionWebJsonProperty, LionWebJsonReference, 
+    LionWebJsonReferenceTarget, LionWebJsonContainment, LionWebJsonNode } from "@lionweb/json";
 import type { PBBulkImport } from "./BulkImport";
 import type { PBChunk } from "./Chunk";
 
@@ -39,22 +40,22 @@ export function convertPBChunkToJsonChunk(pbChunk: PBChunk) : LionWebJsonChunk {
     // }
 
     // Convert nodes with pre-allocated array
-    const convertedNodes = new Array(nodes.length)
+    const convertedNodes : LionWebJsonNode[] = new Array(nodes.length)
     for (let i = 0; i < nodes.length; i++) {
         const pbNode = nodes[i]
         const { properties, containments, references } = pbNode
 
         // Pre-allocate nested arrays
-        const convertedProperties = new Array(properties.length)
-        const convertedContainments = new Array(containments.length)
-        const convertedReferences = new Array(references.length)
+        const convertedProperties : LionWebJsonProperty[] = new Array(properties.length)
+        const convertedContainments : LionWebJsonContainment[] = new Array(containments.length)
+        const convertedReferences : LionWebJsonReference[] = new Array(references.length)
 
         // Convert properties
         for (let j = 0; j < properties.length; j++) {
             const p = properties[j]
             convertedProperties[j] = {
                 property: metaPointersArray[p.metaPointer],
-                value: p.value == undefined ? undefined : internedStrings[p.value]
+                value: p.value == undefined || p.value == null ? null : internedStrings[p.value]
             }
         }
 
@@ -78,7 +79,7 @@ export function convertPBChunkToJsonChunk(pbChunk: PBChunk) : LionWebJsonChunk {
             for (let k = 0; k < r.values.length; k++) {
                 const rv = r.values[k]
                 convertedTargets[k] = {
-                    referred: rv.referred == undefined || rv.referred == null ? null : internedStrings[rv.referred],
+                    reference: rv.referred == undefined || rv.referred == null ? null : internedStrings[rv.referred],
                     resolveInfo: rv.resolveInfo == undefined || rv.resolveInfo == null ? null : internedStrings[rv.resolveInfo]
                 }
             }
@@ -89,8 +90,8 @@ export function convertPBChunkToJsonChunk(pbChunk: PBChunk) : LionWebJsonChunk {
         }
 
         convertedNodes[i] = {
-            id: pbNode.id == undefined ? undefined : internedStrings[pbNode.id],
-            parent: pbNode.parent == undefined ? undefined : internedStrings[pbNode.parent],
+            id: pbNode.id == undefined ? null : internedStrings[pbNode.id],
+            parent: pbNode.parent == undefined ? null : internedStrings[pbNode.parent],
             classifier: metaPointersArray[pbNode.classifier],
             annotations: [], // Empty array as in original
             properties: convertedProperties,

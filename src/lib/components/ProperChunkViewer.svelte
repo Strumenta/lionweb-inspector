@@ -225,19 +225,19 @@
                                                     <span class="text-gray-700 dark:text-gray-300 font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
                                                         {target.resolveInfo}
                                                     </span>
-                                                    {#if target.referred}
+                                                    {#if target.reference}
                                                         <span class="text-gray-400">→</span>
                                                         <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                                                             <Target class="h-3 w-3" />
-                                                            {target.referred}
+                                                            {target.reference}
                                                         </span>
                                                     {:else}
                                                         <span class="text-gray-400 italic">Not resolved</span>
                                                     {/if}
-                                                {:else if target.referred}
+                                                {:else if target.reference}
                                                     <span class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                                                         <Target class="h-3 w-3" />
-                                                        {target.referred}
+                                                        {target.reference}
                                                     </span>
                                                 {:else}
                                                     <span class="text-gray-400 italic">No target info</span>

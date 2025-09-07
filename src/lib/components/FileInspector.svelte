@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
-	import { File as FileIcon, Archive, Folder, Code, Image, FileText, Download, Clock, FileJson } from '@lucide/svelte';
+	import { File as FileIcon, Archive, Folder, Code, Image, FileText, Download, Clock, FileJson, Database } from '@lucide/svelte';
 	import { createEventDispatcher } from 'svelte';
 	import JSZip from 'jszip';
 
@@ -22,6 +22,7 @@
 		loadingTime: number;
 		progress: number;
 		jsonFiles: Array<{ name: string; content: any; size: number }>;
+		pbFiles: Array<{ name: string; content: any; size: number; type: 'bulk' | 'chunk' | 'unknown' }>;
 	} | null>(null);
 	let startTime = $state<number>(0);
 
@@ -38,7 +39,7 @@
 				await inspectZipFile();
 			} else {
 				// Throw error for non-ZIP files
-				throw new Error('Only ZIP files (.zip, .jar, .war, .sps) are supported. Please upload a ZIP archive containing LionWeb JSON chunks.');
+				throw new Error('Only ZIP files (.zip, .jar, .war, .sps) are supported. Please upload a ZIP archive containing LionWeb JSON chunks or protobuffer files.');
 			}
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to inspect file';
@@ -67,19 +68,22 @@
 		// Get all files in the ZIP
 		const allFiles = Object.keys(zipContents.files);
 		const jsonFiles = allFiles.filter(fileName => fileName.toLowerCase().endsWith('.json'));
+		const pbFiles = allFiles.filter(fileName => fileName.toLowerCase().endsWith('.pb'));
 		
 		// Initialize ZIP info
 		zipInfo = {
 			fileCount: allFiles.length,
 			loadingTime: 0,
 			progress: 0,
-			jsonFiles: []
+			jsonFiles: [],
+			pbFiles: []
 		};
 		
-		// Process JSON files
+		// Process files (JSON and protobuffer)
 		let processedCount = 0;
-		const totalJsonFiles = jsonFiles.length;
+		const totalFiles = jsonFiles.length + pbFiles.length;
 		
+		// Process JSON files
 		for (const fileName of jsonFiles) {
 			try {
 				const zipFile = zipContents.files[fileName];
@@ -98,7 +102,56 @@
 			}
 			
 			processedCount++;
-			zipInfo.progress = Math.round((processedCount / totalJsonFiles) * 100);
+			zipInfo.progress = Math.round((processedCount / totalFiles) * 100);
+		}
+		
+		// Process protobuffer files
+		for (const fileName of pbFiles) {
+			try {
+				const zipFile = zipContents.files[fileName];
+				if (!zipFile.dir) {
+					const content = await zipFile.async('uint8array');
+					
+					// Try to parse as BulkImport first, then as Chunk
+					let pbContent: any;
+					let pbType: 'bulk' | 'chunk' | 'unknown';
+					
+					try {
+						// Dynamic import to avoid SSR issues
+						const { PBBulkImport } = await import('$lib/proto/BulkImport.js');
+						pbContent = PBBulkImport.decode(content);
+						pbType = 'bulk';
+					} catch (bulkErr) {
+						try {
+							const { PBChunk } = await import('$lib/proto/Chunk.js');
+							pbContent = PBChunk.decode(content);
+							pbType = 'chunk';
+						} catch (chunkErr) {
+							// If protobuffer parsing fails, store as raw binary data
+							console.warn(`Failed to parse protobuffer file ${fileName} as either BulkImport or Chunk:`, bulkErr, chunkErr);
+							pbContent = {
+								error: 'Failed to parse protobuffer',
+								rawSize: content.length,
+								bulkError: bulkErr.message,
+								chunkError: chunkErr.message
+							};
+							pbType = 'unknown';
+						}
+					}
+					
+					zipInfo.pbFiles.push({
+						name: fileName,
+						content: pbContent,
+						size: content.length,
+						type: pbType
+					});
+				}
+			} catch (err) {
+				console.warn(`Failed to parse protobuffer file ${fileName}:`, err);
+			}
+			
+			processedCount++;
+			zipInfo.progress = Math.round((processedCount / totalFiles) * 100);
 		}
 		
 		// Update loading time
@@ -109,10 +162,17 @@
 			zipFile: file.name,
 			totalFiles: allFiles.length,
 			jsonFiles: jsonFiles.length,
+			pbFiles: pbFiles.length,
 			loadingTime: zipInfo.loadingTime,
 			jsonChunks: zipInfo.jsonFiles.map(f => ({
 				name: f.name,
 				size: f.size,
+				hasContent: !!f.content
+			})),
+			protobufferFiles: zipInfo.pbFiles.map(f => ({
+				name: f.name,
+				size: f.size,
+				type: f.type,
 				hasContent: !!f.content
 			}))
 		};
@@ -169,6 +229,8 @@
 			case 'yml':
 			case 'csv':
 				return FileText;
+			case 'pb':
+				return Database;
 			default:
 				return FileIcon;
 		}
@@ -271,10 +333,32 @@
 							</div>
 						</div>
 					{/if}
+
+					{#if zipInfo.pbFiles.length > 0}
+						<div class="space-y-2">
+							<h4 class="font-medium flex items-center gap-2">
+								<Database class="h-4 w-4" />
+								Protobuffer Files ({zipInfo.pbFiles.length})
+							</h4>
+							<div class="max-h-40 overflow-y-auto space-y-1">
+								{#each zipInfo.pbFiles as pbFile}
+									<div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded text-sm">
+										<div class="flex items-center gap-2">
+											<span class="font-mono text-xs">{pbFile.name}</span>
+											<span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded">
+												{pbFile.type}
+											</span>
+										</div>
+										<span class="text-gray-500">{formatFileSize(pbFile.size)}</span>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
 				</div>
 			{/if}
 
-			{#if fileContent}
+			<!-- {#if fileContent}
 				<div class="space-y-2">
 					<div class="flex items-center justify-between">
 						<h3 class="text-lg font-medium">File Content</h3>
@@ -295,7 +379,7 @@
 						<pre class="text-sm whitespace-pre-wrap break-words">{fileContent}</pre>
 					</div>
 				</div>
-			{/if}
+			{/if} -->
 		</CardContent>
 	</Card>
 {/if}

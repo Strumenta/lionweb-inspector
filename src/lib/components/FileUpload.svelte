@@ -81,7 +81,7 @@
 			File Inspector
 		</CardTitle>
 		<CardDescription>
-			Upload a file or ZIP archive to inspect its contents
+			Upload a ZIP archive containing LionWeb JSON chunks and protobuffer files
 		</CardDescription>
 	</CardHeader>
 	<CardContent>
@@ -130,7 +130,7 @@
 			type="file"
 			class="hidden"
 			onchange={handleInputChange}
-			accept=".zip,.jar,.war,.sps,.json,.xml,.txt,.md,.js,.ts,.html,.css,.py,.java,.cpp,.c,.h,.hpp,.cs,.php,.rb,.go,.rs,.swift,.kt,.scala,.r,.m,.pl,.sh,.bat,.ps1,.sql,.yaml,.yml,.toml,.ini,.cfg,.conf,.log,.csv,.tsv,.xlsx,.xls,.pdf,.doc,.docx,.ppt,.pptx"
+			accept=".zip,.jar,.war,.sps,.json,.xml,.txt,.md,.js,.ts,.html,.css,.py,.java,.cpp,.c,.h,.hpp,.cs,.php,.rb,.go,.rs,.swift,.kt,.scala,.r,.m,.pl,.sh,.bat,.ps1,.sql,.yaml,.yml,.toml,.ini,.cfg,.conf,.log,.csv,.tsv,.xlsx,.xls,.pdf,.doc,.docx,.ppt,.pptx,.pb"
 		/>
 	</CardContent>
 </Card>

@@ -30,6 +30,7 @@
 	"dependencies": {
 		"@lionweb/json": "^0.6.13-beta.5",
 		"@types/jszip": "^3.4.0",
-		"jszip": "^3.10.1"
+		"jszip": "^3.10.1",
+		"protobufjs": "^7.5.4"
 	}
 }

@@ -26,7 +26,7 @@
 	<div class="text-center mb-8">
 		<h1 class="text-4xl font-bold mb-4">LionWeb Inspector</h1>
 		<p class="text-lg text-gray-600 dark:text-gray-400">
-			Upload and inspect files or ZIP archives to explore their contents
+			Upload and inspect ZIP archives containing LionWeb or and protobuffer files
 		</p>
 	</div>
 
@@ -51,9 +51,9 @@
 		<div class="mt-8">
 			<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
 				<h2 class="text-2xl font-semibold mb-4">Content Preview</h2>
-				<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 max-h-96 overflow-auto">
+				<!-- <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 max-h-96 overflow-auto">
 					<pre class="text-sm whitespace-pre-wrap break-words">{fileContent.content}</pre>
-				</div>
+				</div> -->
 			</div>
 		</div>
 	{/if}

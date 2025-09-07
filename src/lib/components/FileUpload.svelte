@@ -7,6 +7,7 @@
 	const dispatch = createEventDispatcher<{
 		fileSelected: { file: File; type: 'zip' | 'single' };
 		fileRemoved: void;
+		autoInspect: { file: File; type: 'zip' | 'single' };
 	}>();
 
 	let fileInput: HTMLInputElement;
@@ -26,6 +27,11 @@
 		}
 		
 		dispatch('fileSelected', { file, type: fileType });
+		
+		// Auto-inspect ZIP files
+		if (fileType === 'zip') {
+			dispatch('autoInspect', { file, type: fileType });
+		}
 	}
 
 	function handleInputChange(event: Event) {

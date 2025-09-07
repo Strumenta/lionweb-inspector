@@ -65,6 +65,14 @@
             depth
         };
     }
+
+    function formatFileSize(bytes: number): string {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
 </script>
 
 <div class="space-y-4">
@@ -155,6 +163,14 @@
             <span class="text-xs text-gray-500">
                 ({data.node.classifier.key})
             </span>
+            <div class="ml-auto flex items-center gap-2">
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                    {data.node.type === 'json' ? 'JSON' : 'Protobuffer'}
+                </span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                    {formatFileSize(data.node.size)}
+                </span>
+            </div>
         </div>
 
         {#if data.node.properties.length > 0}
@@ -163,8 +179,8 @@
                 <div class="space-y-3">
                      {#each data.node.properties as property}
                          <div class="flex gap-3">
-                             <!-- Property Key Column (Tag-like) -->
-                             <div class="flex-shrink-0">
+                             <!-- Property Key Column (Fixed width for alignment) -->
+                             <div class="w-32 flex-shrink-0">
                                  <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                      {property.property.key}
                                  </span>
@@ -173,11 +189,11 @@
                              <!-- Property Value Column -->
                              <div class="flex-1 min-w-0">
                                  {#if property.value}
-                                     <div class="text-gray-700 dark:text-gray-300 font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded whitespace-pre-wrap break-words">
+                                     <div class="text-gray-700 dark:text-gray-300 font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded whitespace-pre-wrap break-words text-left">
                                          {property.value}
                                      </div>
                                  {:else}
-                                     <span class="text-gray-400 italic">No value</span>
+                                     <span class="text-gray-400 italic text-left block">No value</span>
                                  {/if}
                              </div>
                          </div>

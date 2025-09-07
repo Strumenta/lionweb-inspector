@@ -271,6 +271,24 @@
             {/if}
         </div>
         
+        <!-- Annotations Container (Outside the bordered container, only when expanded) -->
+        {#if data.isExpanded && data.node.annotations.length > 0}
+            <div class="relative" style="margin-left: {data.depth * 20 + 20}px;">
+                <div class="mb-2">
+                    <div class="text-xs text-gray-600 dark:text-gray-400 mb-1 font-medium">Annotations:</div>
+                    <div class="space-y-1">
+                        {#each data.node.annotations as annotationId}
+                            <div class="bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded px-2 py-1">
+                                <span class="text-xs font-mono text-yellow-800 dark:text-yellow-200">
+                                    {annotationId}
+                                </span>
+                            </div>
+                        {/each}
+                    </div>
+                </div>
+            </div>
+        {/if}
+
         <!-- Children Container (Outside the bordered container) -->
         {#if data.isExpanded && data.hasChildren}
             <div class="relative" style="margin-left: {data.depth * 20 + 20}px;">

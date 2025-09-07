@@ -4,7 +4,7 @@
     import type { PBChunk } from "$lib/proto";
     import { Button } from '$lib/components/ui/button';
     import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card';
-    import { ChevronRight, ChevronDown, TreePine, FileText, Target } from '@lucide/svelte';
+    import { ChevronRight, ChevronDown, TreePine, FileText, Target, Layers, Eye } from '@lucide/svelte';
 
     let { pbChunk }: { pbChunk: PBChunk } = $props();
 
@@ -16,7 +16,7 @@
     const roots = jsonChunk.nodes.filter(node => node.parent === undefined);
     
     let expandedNodes = $state(new Set<string>());
-    let selectedTree = $state<number | null>(null);
+    let selectedTree = $state<number | null>(0); // First tree selected by default
 
     function toggleNode(nodeId: string) {
         if (expandedNodes.has(nodeId)) {
@@ -89,37 +89,35 @@
             </div>
         </div>
     {:else}
-        <!-- Multiple trees - show selector -->
+        <!-- Multiple trees - compact horizontal switcher -->
         <div class="space-y-4">
-            <h5 class="font-medium text-sm text-gray-700 dark:text-gray-300">Select a tree to view:</h5>
-            <div class="grid gap-2">
+            <div class="flex items-center gap-2">
+                <Layers class="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Trees:</span>
+            </div>
+            
+            <div class="flex flex-wrap gap-2">
                 {#each roots as root, index}
-                    <Button 
-                        variant={selectedTree === index ? "default" : "outline"}
-                        class="justify-start h-auto p-3"
-                        onclick={() => selectedTree = selectedTree === index ? null : index}
+                    <button
+                        class={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                            selectedTree === index 
+                                ? 'bg-blue-600 text-white shadow-md' 
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                        onclick={() => selectedTree = index}
                     >
-                        <div class="flex items-center gap-3 w-full">
-                            <TreePine class="h-4 w-4 flex-shrink-0" />
-                            <div class="flex-1 min-w-0 text-left">
-                                <div class="font-medium text-sm truncate">{getNodeDisplayName(root)}</div>
-                                <div class="text-xs text-gray-500">
-                                    {getChildren(root).length} direct children
-                                </div>
-                            </div>
-                        </div>
-                    </Button>
+                        <TreePine class="h-4 w-4" />
+                        <span class="truncate max-w-32">{getNodeDisplayName(root)}</span>
+                        {#if selectedTree === index}
+                            <div class="w-2 h-2 bg-white rounded-full"></div>
+                        {/if}
+                    </button>
                 {/each}
             </div>
 
             {#if selectedTree !== null}
-                <div class="space-y-2">
-                    <h5 class="font-medium text-sm text-gray-700 dark:text-gray-300">
-                        Tree: {getNodeDisplayName(roots[selectedTree])}
-                    </h5>
-                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
-                        {@render TreeNode(renderTreeNode(roots[selectedTree]))}
-                    </div>
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
+                    {@render TreeNode(renderTreeNode(roots[selectedTree]))}
                 </div>
             {/if}
         </div>

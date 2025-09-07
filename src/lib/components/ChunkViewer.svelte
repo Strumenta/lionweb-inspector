@@ -176,11 +176,6 @@
 											<pre class="text-sm whitespace-pre-wrap break-words">{JSON.stringify(selectedChunk.content, null, 2)}</pre>
 										{:else if protobufferView === 'chunk'}
 											<div class="text-center py-8">
-												
-												 NODES: {JSON.stringify((selectedChunk.content as PBChunk).nodes.length)}
-												 LANGUAGES: {JSON.stringify((selectedChunk.content as PBChunk).internedLanguages.length)}
-												 METAPOINTERS: {JSON.stringify((selectedChunk.content as PBChunk).internedMetaPointers.length)}
-												 STRINGS: {JSON.stringify((selectedChunk.content as PBChunk).internedStrings.length)}
 												 <ProperChunkViewer pbChunk={selectedChunk.content as PBChunk} />
 											</div>
 										{:else if protobufferView === 'loaded'}

@@ -90,7 +90,7 @@
 
 <div class="space-y-4">
     <div class="flex items-center justify-between">
-        <h4 class="text-lg font-medium">Chunk View</h4>
+        <div></div> <!-- necessary for the layout-->
         <div class="text-sm text-gray-500 dark:text-gray-400">
             {roots.length} root{roots.length !== 1 ? 's' : ''} found
         </div>
@@ -104,8 +104,8 @@
     {:else if roots.length === 1}
         <!-- Single tree - show directly -->
         <div class="space-y-2">
-            <h5 class="font-medium text-sm text-gray-700 dark:text-gray-300">Tree Structure</h5>
-            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
+            <!-- <h5 class="font-medium text-sm text-gray-700 dark:text-gray-300">Tree Structure</h5> -->
+            <div class="/*border border-gray-200*/ dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900">
                 {@render TreeNode(renderTreeNode(roots[0]))}
             </div>
         </div>
@@ -178,14 +178,14 @@
                 <span class="text-xs text-gray-500">
                     ({data.node.classifier.key})
                 </span>
-                <div class="ml-auto flex items-center gap-2">
+                <!-- <div class="ml-auto flex items-center gap-2">
                     <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
                         {data.node.type === 'json' ? 'JSON' : 'Protobuffer'}
                     </span>
                     <span class="text-xs text-gray-500 dark:text-gray-400">
                         {formatFileSize(data.node.size)}
                     </span>
-                </div>
+                </div> -->
             </div>
 
             {#if data.node.properties.length > 0}

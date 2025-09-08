@@ -84,11 +84,11 @@
 	<CardHeader>
 		<CardTitle class="flex items-center gap-2">
 			<Upload class="h-5 w-5" />
-			File Inspector
+			Upload a LionWeb archive
 		</CardTitle>
-		<CardDescription>
-			Upload a ZIP archive containing LionWeb JSON chunks and protobuffer files
-		</CardDescription>
+		<!-- <CardDescription>
+			Upload a LionWeb archive
+		</CardDescription> -->
 	</CardHeader>
 	<CardContent>
 		{#if !selectedFile}

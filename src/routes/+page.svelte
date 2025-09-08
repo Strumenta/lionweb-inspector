@@ -79,7 +79,7 @@
 				<div>
 					<h1 class="text-2xl font-bold">LionWeb Inspector</h1>
 					<p class="text-sm text-gray-600 dark:text-gray-400">
-						Viewing {importedData.jsonFiles.length + importedData.pbFiles.length} chunks from {selectedFile?.name}
+						{importedData.jsonFiles.length + importedData.pbFiles.length} partitions loaded from {selectedFile?.name}
 					</p>
 				</div>
 				<button 
@@ -107,9 +107,9 @@
 	<div class="container mx-auto px-4 py-8 max-w-4xl">
 		<div class="text-center mb-8">
 			<h1 class="text-4xl font-bold mb-4">LionWeb Inspector</h1>
-			<p class="text-lg text-gray-600 dark:text-gray-400">
-				Upload and inspect ZIP archives containing LionWeb JSON chunks and protobuffer files
-			</p>
+			<!-- <p class="text-lg text-gray-600 dark:text-gray-400">
+				Upload and inspect LionWeb archive
+			</p> -->
 		</div>
 
 		<div class="flex justify-center">

@@ -82,7 +82,7 @@
 						<div class="flex items-center gap-3 w-full">
 							<IconComponent class="h-4 w-4 flex-shrink-0" />
 							<div class="flex-1 min-w-0">
-								<div class="font-medium text-sm truncate">{chunk.name}</div>
+								<div class="font-medium text-sm truncate text-left">{chunk.name}</div>
 								<div class="text-xs text-gray-500 flex items-center gap-2">
 									<span>{formatFileSize(chunk.size)}</span>
 									{#if chunk.type === 'pb' && chunk.pbType}

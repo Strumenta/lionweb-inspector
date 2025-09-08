@@ -193,16 +193,16 @@
                     <!-- <div class="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">Properties:</div> -->
                     <div class="space-y-3">
                          {#each data.node.properties as property}
-                             <div class="flex gap-3">
-                                 <!-- Property Key Column (Fixed width for alignment) -->
-                                 <div class="w-32 flex-shrink-0">
+                             <div class="grid grid-cols-3 gap-3">
+                                 <!-- Property Key Column (1/3) -->
+                                 <div class="flex items-center">
                                      <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                          {property.property.key}
                                      </span>
                                  </div>
                                  
-                                 <!-- Property Value Column -->
-                                 <div class="flex-1 min-w-0">
+                                 <!-- Property Value Column (2/3) -->
+                                 <div class="col-span-2">
                                      {#if property.value}
                                          <div class="text-gray-700 dark:text-gray-300 font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded whitespace-pre-wrap break-words text-left">
                                              {property.value}
@@ -222,16 +222,16 @@
                     <!-- <div class="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">References:</div> -->
                     <div class="space-y-3">
                         {#each data.node.references as reference}
-                            <div class="flex gap-3">
-                                <!-- Reference Key Column (Tag-like) -->
-                                <div class="flex-shrink-0">
+                            <div class="grid grid-cols-3 gap-3">
+                                <!-- Reference Key Column (1/3) -->
+                                <div class="flex items-center">
                                     <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                         {reference.reference.key}
                                     </span>
                                 </div>
                                 
-                                <!-- Targets Column -->
-                                <div class="flex-1 min-w-0">
+                                <!-- Targets Column (2/3) -->
+                                <div class="col-span-2">
                                     {#if reference.targets.length > 0}
                                         <div class="space-y-1">
                                             {#each reference.targets as target}

@@ -149,7 +149,7 @@
 {#snippet TreeNode(data)}
     <div class="select-none">
         <!-- Node Container with Properties and References -->
-        <div class="border border-black dark:border-white rounded-lg mb-2 bg-white dark:bg-gray-800" style="background-color: ivory;">
+        <div class="border border-black dark:border-white rounded-lg mb-2 bg-white dark:bg-gray-800 max-w-4xl text-xl" style="background-color: ivory;">
             <div 
                 class="flex items-center gap-2 py-2 px-3 rounded-t-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
                 style="padding-left: {data.depth * 12 + 12}px"
@@ -190,7 +190,7 @@
 
             {#if data.node.properties.length > 0}
                 <div class="border-t border-gray-200 dark:border-gray-700 rounded-b-lg p-3">
-                    <div class="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">Properties:</div>
+                    <!-- <div class="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">Properties:</div> -->
                     <div class="space-y-3">
                          {#each data.node.properties as property}
                              <div class="flex gap-3">
@@ -219,7 +219,7 @@
         
             {#if data.node.references.length > 0}
                 <div class="border-t border-gray-200 dark:border-gray-700 rounded-b-lg p-3">
-                    <div class="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">References:</div>
+                    <!-- <div class="text-xs text-gray-600 dark:text-gray-400 mb-2 font-medium">References:</div> -->
                     <div class="space-y-3">
                         {#each data.node.references as reference}
                             <div class="flex gap-3">

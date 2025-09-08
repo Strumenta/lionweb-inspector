@@ -5,6 +5,13 @@
 	import { ProperChunkViewer } from '$lib/components';
     import { PBChunk } from '$lib/proto';
 
+	interface Partition {
+		rootId: string;
+		content: any;
+		type: 'json' | 'pb';
+		size: number;
+	}
+
 	let { 
 		jsonFiles = [],
 		pbFiles = []
@@ -13,16 +20,16 @@
 		pbFiles?: Array<{ name: string; content: any; size: number; type: 'bulk' | 'chunk' | 'unknown' }>;
 	} = $props();
 
-	let selectedPartition: { name: string; content: any; type: 'json' | 'pb'; size: number; pbType?: string } | null = $state(null);
+	let selectedPartition: Partition | null = $state(null);
 	let protobufferView: 'raw' | 'chunk' | 'loaded' = $state('raw');
 
 	// Combine all chunks into a single list
 	function getAllPartitions() {
-		const chunks: Array<{ name: string; content: any; type: 'json' | 'pb'; size: number; pbType?: string }> = [];
+		const chunks: Array<Partition> = [];
 		
 		jsonFiles.forEach(file => {
 			chunks.push({
-				name: file.name,
+				rootId: file.name,
 				content: file.content,
 				type: 'json',
 				size: file.size
@@ -31,11 +38,10 @@
 		
 		pbFiles.forEach(file => {
 			chunks.push({
-				name: file.name,
+				rootId: file.name,
 				content: file.content,
 				type: 'pb',
-				size: file.size,
-				pbType: file.type
+				size: file.size
 			});
 		});
 		
@@ -67,7 +73,7 @@
 	<div class="w-80 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
 		<div class="p-4 border-b border-gray-200 dark:border-gray-700">
 			<h2 class="text-lg font-semibold">Partitions ({getAllPartitions().length})</h2>
-			<p class="text-sm text-gray-600 dark:text-gray-400">Select a chunk to view</p>
+			<p class="text-sm text-gray-600 dark:text-gray-400">Select a partition to view</p>
 		</div>
 		
 		<div class="overflow-y-auto h-full">
@@ -75,21 +81,16 @@
 				{#each getAllPartitions() as chunk}
 					{@const IconComponent = getChunkIcon(chunk)}
 					<Button
-						variant={selectedPartition?.name === chunk.name ? "default" : "ghost"}
+						variant={selectedPartition?.rootId === chunk.rootId ? "default" : "ghost"}
 						class="w-full justify-start h-auto p-3"
 						onclick={() => selectChunk(chunk)}
 					>
 						<div class="flex items-center gap-3 w-full">
 							<IconComponent class="h-4 w-4 flex-shrink-0" />
 							<div class="flex-1 min-w-0">
-								<div class="font-medium text-sm truncate text-left">{chunk.name}</div>
+								<div class="font-medium text-sm truncate text-left">{chunk.rootId}</div>
 								<div class="text-xs text-gray-500 flex items-center gap-2">
 									<span>{formatFileSize(chunk.size)}</span>
-									{#if chunk.type === 'pb' && chunk.pbType}
-										<span class="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-xs">
-											{chunk.pbType}
-										</span>
-									{/if}
 								</div>
 							</div>
 						</div>
@@ -110,7 +111,7 @@
 							<CardTitle class="flex items-center justify-between">
 								<div class="flex items-center gap-2">
 									<IconComponent class="h-5 w-5" />
-									{selectedPartition.name}
+									{selectedPartition.rootId}
 								</div>
 								<div class="flex items-center gap-3">
 									<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
@@ -121,12 +122,9 @@
 									</span>
 								</div>
 							</CardTitle>
-							<CardDescription>
+							<!-- <CardDescription>
 								{selectedPartition.type === 'json' ? 'JSON Chunk' : 'Protobuffer Chunk'} • {formatFileSize(selectedPartition.size)}
-								{#if selectedPartition.type === 'pb' && selectedPartition.pbType}
-									• {selectedPartition.pbType}
-								{/if}
-							</CardDescription>
+							</CardDescription> -->
 						{/if}
 					</CardHeader>
 					<CardContent>
@@ -134,7 +132,7 @@
 							<!-- Content Preview -->
 							<div class="space-y-4">
 								<div class="flex items-center justify-between">
-									<h3 class="text-lg font-medium">Content Preview</h3>
+									<!-- <h3 class="text-lg font-medium">Content Preview</h3> -->
 									{#if selectedPartition.type === 'pb'}
 										<div class="flex gap-2">
 											<Button 

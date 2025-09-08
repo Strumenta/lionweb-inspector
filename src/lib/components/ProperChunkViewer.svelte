@@ -226,7 +226,8 @@
                                 <!-- Reference Key Column (1/3) -->
                                 <div class="flex items-center">
                                     <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                        {reference.reference.key}
+                                        {reference.reference.language}/{reference.reference.version}<br>
+                                        <b>{reference.reference.key}</b>
                                     </span>
                                 </div>
                                 

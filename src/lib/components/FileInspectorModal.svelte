@@ -57,7 +57,7 @@
 		// Get all files in the ZIP
 		const allFiles = Object.keys(zipContents.files);
 		const jsonFiles = allFiles.filter(fileName => fileName.toLowerCase().endsWith('.json'));
-		const pbFiles = allFiles.filter(fileName => fileName.toLowerCase().endsWith('.pb'));
+		const pbFiles = allFiles.filter(fileName => fileName.toLowerCase().endsWith('.binpb'));
 		
 		// Initialize ZIP info
 		zipInfo = {

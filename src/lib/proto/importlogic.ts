@@ -10,7 +10,7 @@ export function convertPBChunkToJsonChunk(pbChunk: PBChunk) : LionWebJsonChunk {
 
     const internedStrings : (string|null)[] = new Array(preInternedStrings.length + 1)
     internedStrings[0] = null
-    for (let i = 0; i < internedStrings.length; i++) {
+    for (let i = 0; i < preInternedStrings.length; i++) {
         internedStrings[i+1] = preInternedStrings[i]
     }
 

@@ -13,7 +13,7 @@
     jsonChunk.nodes.forEach(node => {
         nodesByID.set(node.id, node);
     });
-    const roots = jsonChunk.nodes.filter(node => node.parent === undefined);
+    const roots = jsonChunk.nodes.filter(node => node.parent == null);
     
     let expandedNodes = $state(new Set<string>());
     let selectedTree = $state<number | null>(0); // First tree selected by default

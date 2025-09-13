@@ -1,30 +1,39 @@
-import type { LionWebJsonChunk, LionWebJsonProperty, LionWebJsonReference, 
-    LionWebJsonReferenceTarget, LionWebJsonContainment, LionWebJsonNode } from "@lionweb/json";
+import type {
+    LionWebJsonChunk, LionWebJsonProperty, LionWebJsonReference,
+    LionWebJsonReferenceTarget, LionWebJsonContainment, LionWebJsonNode, LionWebJsonUsedLanguage
+} from "@lionweb/json";
 import type { PBBulkImport } from "./BulkImport";
 import type { PBChunk } from "./Chunk";
 
 export function convertPBChunkToJsonChunk(pbChunk: PBChunk) : LionWebJsonChunk {
-    const { internedStrings, internedLanguages, internedMetaPointers, nodes } = pbChunk
+    const { internedStrings:preInternedStrings, internedLanguages, internedMetaPointers, nodes } = pbChunk
+
+    const internedStrings : (string|null)[] = new Array(preInternedStrings.length + 1)
+    internedStrings[0] = null
+    for (let i = 0; i < internedStrings.length; i++) {
+        internedStrings[i+1] = preInternedStrings[i]
+    }
 
     // Pre-compute all language mappings
-    const languagesArray = new Array(internedLanguages.length)
+    const languagesArray : (LionWebJsonUsedLanguage|null)[] = new Array(internedLanguages.length + 1)
+    languagesArray[0] = null
     for (let i = 0; i < internedLanguages.length; i++) {
         const pbLanguage = internedLanguages[i]
-        languagesArray[i] = {
-            key: pbLanguage.key == undefined ? undefined : internedStrings[pbLanguage.key],
-            version: pbLanguage.version == undefined ? undefined : internedStrings[pbLanguage.version]
-        }
+        languagesArray[i+1] = {
+            key: pbLanguage.siKey == undefined ? undefined : internedStrings[pbLanguage.siKey],
+            version: pbLanguage.siVersion == undefined ? undefined : internedStrings[pbLanguage.siVersion]
+        } as LionWebJsonUsedLanguage
     }
 
     // Pre-compute all metapointer mappings using arrays instead of Map
     const metaPointersArray = new Array(internedMetaPointers.length)
     for (let i = 0; i < internedMetaPointers.length; i++) {
         const pbMetaPointer = internedMetaPointers[i]
-        const languageVersion = languagesArray[pbMetaPointer.language]
+        const languageVersion = languagesArray[pbMetaPointer.liLanguage]
         metaPointersArray[i] = {
-            language: languageVersion.key,
-            version: languageVersion.version,
-            key: pbMetaPointer.key == undefined ? undefined : internedStrings[pbMetaPointer.key]
+            language: languageVersion == undefined ? null : languageVersion.key,
+            version: languageVersion == undefined ? null : languageVersion.version,
+            key: pbMetaPointer.siKey == undefined ? undefined : internedStrings[pbMetaPointer.siKey]
         }
     }
 
@@ -54,20 +63,20 @@ export function convertPBChunkToJsonChunk(pbChunk: PBChunk) : LionWebJsonChunk {
         for (let j = 0; j < properties.length; j++) {
             const p = properties[j]
             convertedProperties[j] = {
-                property: metaPointersArray[p.metaPointer],
-                value: p.value == undefined || p.value == null ? null : internedStrings[p.value]
+                property: metaPointersArray[p.mpiMetaPointer],
+                value: p.siValue == undefined ? null : internedStrings[p.siValue]
             }
         }
 
         // Convert containments
         for (let j = 0; j < containments.length; j++) {
             const c = containments[j]
-            const convertedChildren = new Array(c.children.length)
-            for (let k = 0; k < c.children.length; k++) {
-                convertedChildren[k] = internedStrings[c.children[k]]
+            const convertedChildren = new Array(c.siChildren.length)
+            for (let k = 0; k < c.siChildren.length; k++) {
+                convertedChildren[k] = internedStrings[c.siChildren[k]]
             }
             convertedContainments[j] = {
-                containment: metaPointersArray[c.metaPointer],
+                containment: metaPointersArray[c.mpiMetaPointer],
                 children: convertedChildren
             }
         }
@@ -79,21 +88,26 @@ export function convertPBChunkToJsonChunk(pbChunk: PBChunk) : LionWebJsonChunk {
             for (let k = 0; k < r.values.length; k++) {
                 const rv = r.values[k]
                 convertedTargets[k] = {
-                    reference: rv.referred == undefined || rv.referred == null ? null : internedStrings[rv.referred],
-                    resolveInfo: rv.resolveInfo == undefined || rv.resolveInfo == null ? null : internedStrings[rv.resolveInfo]
+                    reference: rv.siReferred == undefined ? null : internedStrings[rv.siReferred],
+                    resolveInfo: rv.siResolveInfo == undefined ? null : internedStrings[rv.siResolveInfo]
                 }
             }
             convertedReferences[j] = {
-                reference: metaPointersArray[r.metaPointer],
+                reference: metaPointersArray[r.mpiMetaPointer],
                 targets: convertedTargets
             }
         }
 
+        const convertedAnnotations = new Array(pbNode.siAnnotations.length)
+        for (let j = 0; j < convertedAnnotations.length; j++) {
+            convertedAnnotations[j] = internedStrings[pbNode.siAnnotations[j]]
+        }
+
         convertedNodes[i] = {
-            id: pbNode.id == undefined ? null : internedStrings[pbNode.id],
-            parent: pbNode.parent == undefined ? null : internedStrings[pbNode.parent],
-            classifier: metaPointersArray[pbNode.classifier],
-            annotations: [], // Empty array as in original
+            id: pbNode.siId == undefined ? null : internedStrings[pbNode.siId],
+            parent: pbNode.siParent == undefined ? null : internedStrings[pbNode.siParent],
+            classifier: metaPointersArray[pbNode.mpiClassifier],
+            annotations: convertedAnnotations,
             properties: convertedProperties,
             containments: convertedContainments,
             references: convertedReferences
